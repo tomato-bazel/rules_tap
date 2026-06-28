@@ -1,0 +1,16 @@
+load("@bazel_skylib//rules:native_binary.bzl", "native_binary")
+
+package(default_visibility = ["//visibility:public"])
+
+# The prebuilt `tap` CLI for the host arch (the binary CI shells out to for change-based test
+# selection). Usage from a consumer workspace:
+#
+#   bazel run @rules_tap//cli:tap -- affected --base "$BASE_SHA" --tag perf-gate | xargs bazel test
+native_binary(
+    name = "tap",
+    src = select({
+        "@platforms//os:linux": "@tap_cli_linux_x86_64//:tap",
+        "@platforms//os:macos": "@tap_cli_darwin_arm64//:tap",
+    }),
+    out = "tap",
+)
