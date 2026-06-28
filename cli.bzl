@@ -13,19 +13,19 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 _CLI_BUILD = 'exports_files(["tap"])\n'
 
-_BASE = "https://github.com/fastverk/rules_tap/releases/download/tap-cli-v0.0.1"
+_BASE = "https://github.com/fastverk/rules_tap/releases/download/tap-cli-v0.0.2"
 
 def _tap_cli_ext_impl(_ctx):
     http_archive(
         name = "tap_cli_linux_x86_64",
         url = _BASE + "/tap-linux_x86_64.tar.gz",
-        sha256 = "656a24625fc7c180e678a45b2d88ec9ce433b69e7e484b93287c26281df3d1e0",
+        sha256 = "3cf45c0b35f01e8728df64420e510f79fdf5c5c5c9dcdb2dd7e2a405ca1fb0ad",
         build_file_content = _CLI_BUILD,
     )
     http_archive(
         name = "tap_cli_darwin_arm64",
         url = _BASE + "/tap-darwin_arm64.tar.gz",
-        sha256 = "954322a878d79359eeb69c241e6d38d008c521326c3b42e80301c303f4e6f743",
+        sha256 = "287a3224a45c74a6c0174797b21e9c5dea20895cf30338c89b3f1cd004fe1c33",
         build_file_content = _CLI_BUILD,
     )
 

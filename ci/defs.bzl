@@ -19,18 +19,26 @@ generated pipeline with ZERO coupling between the two modules:
 
 The generated job supersedes the legacy `scripts/ci/affected-test-targets.sh`: it runs
 the prebuilt `tap` CLI — fetched anonymously from the public rules_tap release, no GitHub
-auth — to print the `bazel test` labels affected by the MR diff, then runs exactly those
+auth — to print the affected `bazel test` labels, then runs exactly those
 (`bazel run @rules_tap//cli:tap -- affected … | xargs -r bazel test`), matching the
 invocation in this repo's README and the legacy bash. `xargs -r` skips `bazel test` on an
 empty diff (no affected tests) rather than invoking it with no targets, and `set -o
 pipefail` makes a failure in the affected-selection step fail the job instead of being
 masked by xargs' success.
+
+The CLI is CI-env-aware (since tap-cli-v0.0.2): with no `--base` it resolves the diff base
+from the pipeline env (CI_MERGE_REQUEST_DIFF_BASE_SHA, GITHUB_BASE_REF, then the
+origin/main merge-base) AND forces the full tag-filtered universe on a tag pipeline, a
+default-branch build, or the BAZEL_TEST_ALL override. So this ONE job is correct in every
+pipeline context — affected on MRs, full on main/tags — with no `rules:` gymnastics. That's
+why `diff_base` defaults to "" (omit `--base`, let the CLI resolve); pass an explicit value
+only for a non-standard CI where the env vars differ.
 """
 
 def tap_ci_feature(
         job_name = "test:affected",
         stage = "test",
-        diff_base = "$CI_MERGE_REQUEST_DIFF_BASE_SHA",
+        diff_base = "",
         tag = None,
         cli_target = "@rules_tap//cli:tap",
         bazel = "bazel",
@@ -43,9 +51,10 @@ def tap_ci_feature(
     Args:
       job_name: the generated GitLab CI job name (default "test:affected").
       stage: the pipeline stage the job runs in (default "test").
-      diff_base: shell expression for the base ref to diff against (default the GitLab
-        MR base SHA). Pass `diff_base = ""` to omit `--base` and let the CLI fall back to
-        the `origin/main` merge-base (branch pushes with no MR context).
+      diff_base: shell expression for an explicit base ref to diff against. Default "" =
+        omit `--base` and let the env-aware CLI resolve it (CI_MERGE_REQUEST_DIFF_BASE_SHA
+        / GITHUB_BASE_REF / origin/main merge-base) and force full runs on main/tags — the
+        correct, normal case. Set a value only for a non-standard CI.
       tag: restrict to tests carrying this Bazel tag (e.g. "perf-gate"); None = all tests.
       cli_target: the prebuilt tap CLI label (default "@rules_tap//cli:tap").
       bazel: the bazel launcher invoked in the job (default "bazel").

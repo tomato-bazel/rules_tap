@@ -20,7 +20,7 @@ common --registry=https://bcr.bazel.build/
 `MODULE.bazel`:
 
 ```python
-bazel_dep(name = "rules_tap", version = "0.0.2")
+bazel_dep(name = "rules_tap", version = "0.0.3")
 ```
 
 ## Use
