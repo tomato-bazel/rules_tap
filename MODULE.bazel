@@ -7,7 +7,7 @@
 # same split rules_lang uses for the polyglot atlas oleans.
 module(
     name = "rules_tap",
-    version = "0.0.1",
+    version = "0.0.2",
 )
 
 bazel_dep(name = "platforms", version = "1.0.0")

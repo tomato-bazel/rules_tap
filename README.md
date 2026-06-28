@@ -20,7 +20,7 @@ common --registry=https://bcr.bazel.build/
 `MODULE.bazel`:
 
 ```python
-bazel_dep(name = "rules_tap", version = "0.0.1")
+bazel_dep(name = "rules_tap", version = "0.0.2")
 ```
 
 ## Use
@@ -45,8 +45,24 @@ bazel build //... --aspects=@rules_tap//bazel:aspects.bzl%test_impact_aspect --o
 
 ```sh
 bazel run @rules_tap//cli:tap -- affected --base "$CI_MERGE_REQUEST_DIFF_BASE_SHA" --tag perf-gate \
-  | xargs bazel test --keep_going
+  | xargs -r bazel test --keep_going
 ```
+
+Or, on a [`fastverk_project`](https://github.com/fastverk/rules_ci) (rules_ci) repo, get that lane
+**by convention** — no hand-wired script — via the `tap_ci_feature()` helper:
+
+```python
+load("@rules_tap//ci:defs.bzl", "tap_ci_feature")
+
+fastverk_project(
+    name = "project",
+    repo = "aion/db",
+    features = {"tap": tap_ci_feature()},  # adds the `test:affected` lane to the generated pipeline
+)
+```
+
+`tap_ci_feature()` returns a `fastverk_project` feature bundle (`{"jobs", "variables"}`) — rules_ci
+takes no dependency on rules_tap; its generic `features` mechanism composes the lane.
 
 ## Surface
 
@@ -54,3 +70,4 @@ bazel run @rules_tap//cli:tap -- affected --base "$CI_MERGE_REQUEST_DIFF_BASE_SH
 |---|---|
 | `@rules_tap//bazel:defs.bzl` | `test_impact_aspect`, `tap_test_attrs`, `tap_test_universe` (pure Starlark) |
 | `@rules_tap//cli:tap` | the prebuilt `tap` CLI (`native_binary`, host-arch-selected) |
+| `@rules_tap//ci:defs.bzl` | `tap_ci_feature()` — the affected-test lane as a `fastverk_project` feature bundle |

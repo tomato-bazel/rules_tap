@@ -1,0 +1,11 @@
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+
+package(default_visibility = ["//visibility:public"])
+
+# The `fastverk_project` feature-bundle helper consumers load as
+# `@rules_tap//ci:defs.bzl`. Pure Starlark (returns a dict) — no rule deps, and no
+# coupling back to rules_ci.
+bzl_library(
+    name = "defs",
+    srcs = ["defs.bzl"],
+)
