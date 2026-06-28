@@ -19,15 +19,13 @@ def _tap_cli_ext_impl(_ctx):
     http_archive(
         name = "tap_cli_linux_x86_64",
         url = _BASE + "/tap-linux_x86_64.tar.gz",
-        # filled by the first publish-tap-cli release; until then //cli:tap is unbuildable but the
-        # //bazel rules resolve fine (the CLI repo is only fetched when //cli:tap is needed).
-        sha256 = "0000000000000000000000000000000000000000000000000000000000000000",
+        sha256 = "656a24625fc7c180e678a45b2d88ec9ce433b69e7e484b93287c26281df3d1e0",
         build_file_content = _CLI_BUILD,
     )
     http_archive(
         name = "tap_cli_darwin_arm64",
         url = _BASE + "/tap-darwin_arm64.tar.gz",
-        sha256 = "0000000000000000000000000000000000000000000000000000000000000000",
+        sha256 = "954322a878d79359eeb69c241e6d38d008c521326c3b42e80301c303f4e6f743",
         build_file_content = _CLI_BUILD,
     )
 
